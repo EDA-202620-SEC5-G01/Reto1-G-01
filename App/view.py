@@ -2,13 +2,18 @@ import sys
 default_limit = 1000
 sys.setrecursionlimit(default_limit*10)
 import time
+import App.logic as logic
+from tabulate import tabulate
+import DataStructures.array_list as arr
+import DataStructures.single_linked_list as sll
 
 def new_logic():
     """
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    control=logic.new_logic()
+    return control
 
 def print_menu():
     print("Bienvenido")
@@ -26,8 +31,53 @@ def load_data(control):
     Carga los datos
     """
     #TODO: Realizar la carga de datos
-    pass
-
+    filename="chocolate_sale_100_elementos.csv"
+    print("Cargando información de los archivos ....\n")
+    start_time=logic.get_time()
+    res=logic.load_data(control,filename)
+    end_time=logic.get_time()
+    tiempo=logic.delta_time(start_time,end_time)
+    print("Reporte de carga de datos")
+    print("--------------------------")
+    print(f"Tiempo de ejecución: {tiempo} ms")
+    print(f"Total de pedidos: {res['total_pedidos']}\n")
+    
+    def columnas(pedido):
+        return[
+            pedido.get("Order_ID",""),
+            pedido.get("Product",""),
+            pedido.get("Country",""),
+            pedido.get("Channel",""),
+            pedido.get("Order_Date",""),
+            pedido.get("Price_per_Box",""),
+            pedido.get("Amount","")
+        ]
+    cabeceras=["Order_ID","Product","Country","Channel","Order_Date","Price_per_Box","Amount"]
+    
+    print("--Pedidos con mayor y menor amount--")
+    tabla_extremos=[
+        ["Menor"]+columnas(res["pedido_min"]),
+        ["Mayor"]+columnas(res["pedido_max"])
+    ]
+    print(tabulate(tabla_extremos,headers=["Tipo"]+cabeceras,tablefmt="grid"))
+    print("\n")
+    print("--Primeros 5 pedidos--")
+    tabla_primeros=[]
+    total_primeros=arr.size(res["primeros_5"])
+    for i in range(1,total_primeros+1):
+        pedido=arr.get(res["primeros_5"],i)
+        tabla_primeros.append(columnas(pedido))
+    print(tabulate(tabla_primeros,headers=cabeceras,tablefmt="grid"))
+    print("\n")
+    print("--Últimos 5 pedidos--")
+    tabla_ultimos=[]
+    total_ultimos=arr.size(res["ultimos_5"])
+    for i in range(1,total_ultimos+1):
+        pedido=arr.get_element(res["ultimos_5"],i)
+        tabla_ultimos.append(columnas(pedido))
+    print(tabulate(tabla_ultimos,headers=cabeceras,tablefmt="grid"))
+    print("\n")
+    return res
 
 def print_data(control, id):
     """
