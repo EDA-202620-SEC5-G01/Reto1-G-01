@@ -91,7 +91,39 @@ def print_req_1(control):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    pass
+    producto=input(f"Ingrese el nombre del producto a buscar: ").strip()
+    start_time=logic.get_time()
+    res=logic.req_1(control,producto)
+    end_time=logic.get_time()
+    
+    tiempo=logic.delta_time(start_time,end_time)
+    if res is None:
+        print(f"No se encontró ningún pedido con el producto '{producto}'")
+    
+    print(f"Tiempo de ejecución: {tiempo} ms")
+    print(f"Total de pedidos con el producto '{producto}': {res['count']}")
+    print(f"Año con mas pedidos: {res['year_max']}")
+    tabla_stats = [
+        ["Precio por caja (USD)", f"${res['avg_price']:.2f}", f"${res['min_price']:.2f}", f"${res['max_price']:.2f}"],
+        ["Descuento (%)", f"{res['avg_discount']:.2f}%", f"{res['min_discount']:.2f}%", f"{res['max_discount']:.2f}%"],
+        ["Cajas enviadas", f"{res['avg_boxes']:.2f}", f"{res['min_boxes']}", f"{res['max_boxes']}"],
+        ["Inversión en Mercadeo (USD)", f"${res['avg_marketing']:.2f}", f"${res['min_marketing']:.2f}", f"${res['max_marketing']:.2f}"]
+    ]
+    headers=["Caracteristicas", 'Promedio','Minimo', 'Maximo']
+    print(tabulate(tabla_stats, headers=headers, tablefmt="grid"))
+    print('\n')
+    def datos_pedido(pedido):
+        return [
+            pedido.get("Order_ID", ""),
+            pedido.get("Country", ""),
+            pedido.get("Order_Date", ""),
+            f"${float(pedido.get('Price_per_Box', 0)):.2f}",
+            f"${float(pedido.get('Marketing_Spend', 0)):.2f}",
+            f"${float(pedido.get('Amount', 0)):.2f}"
+        ]
+    print(f'Valor minimo{res['min_price']}')
+    print(f'Valor maximo{res['max_price']}')
+    
 
 
 def print_req_2(control):

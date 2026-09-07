@@ -81,13 +81,75 @@ def load_data(catalog, filename):
 # Funciones de consulta sobre el catálogo
 
 
-def req_1(catalog):
+def req_1(catalog,producto):
     """
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
-    pass
-
+    count=0
+    min_order=None
+    max_order=None
+    for pedido in catalog["array_list"]["elements"]:
+        if pedido["Product"] == producto:
+            count+=1
+            suma_price+=pedido["Price_per_Box"]
+            suma_discount+=pedido["Discount_pct"]
+            suma_boxes+=pedido["Boxes_shipped"]
+            suma_mrkt+=pedido["Marketing_Spend"]
+            
+            min_ppb=min(min_ppb,pedido["Price_per_Box"])
+            max_ppb=max(max_ppb,pedido["Price_per_Box"])
+            min_dis=min(min_dis,pedido["Discount_pct"])
+            max_dis=max(max_dis,pedido["Discount_pct"])
+            min_box=min(min_box,pedido["Boxes_shipped"])
+            max_box=max(max_box,pedido["Boxes_shipped"])
+            min_mrkt=min(min_mrkt,pedido["Marketing_Spend"])
+            max_mrkt=max(max_mrkt,pedido["Marketing_Spend"])
+            
+            fecha=str(pedido["Order_Date"])
+            contador_anio={}
+            if "-" in fecha:
+                anio=fecha.split("-")[0]
+            else:
+                fecha
+            contador_anio[anio]=contador_anio.get(anio,0)+1
+            
+            if min_order is None:
+                min_order=pedido
+            else:
+                if pedido["Amount"]<min_order["Amount"]:
+                    min_order=pedido
+                elif pedido["Amount"]==min_order["Amount"]:
+                    if pedido["Marketing_Spend"]<min_order["Marketing_Spend"]:
+                        min_order=pedido
+            if max_order is None:
+                max_order=pedido
+            else:
+                if pedido["Amount"]>max_order["Amount"]:
+                    max_order=pedido
+                elif pedido["Amount"]==max_order["Amount"]:
+                    if pedido["Marketing_Spend"]>max_order["Marketing_Spend"]:
+                        max_order=pedido
+    if count==0:
+        return None
+    prom_ppb=suma_price/count
+    prom_dis=suma_discount/count
+    prom_box=suma_boxes/count
+    prom_mrkt=suma_mrkt/count
+    
+    if contador_anio:
+        anio_mas_pedidos=max(contador_anio,key=contador_anio.get)
+    else:
+        "Unknown"
+    return {
+        "promedio price_per_box": prom_ppb,
+        "promedio discount": prom_dis,
+        "promedio boxes_shipped": prom_box,
+        "promedio marketing_spend": prom_mrkt,
+        "año con más pedidos": anio_mas_pedidos,
+        "pedido con menor amount": min_order,
+        "pedido con mayor amount": max_order
+    }
 
 def req_2(catalog):
     """
