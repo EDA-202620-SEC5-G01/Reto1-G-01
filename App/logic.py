@@ -29,8 +29,8 @@ def load_data(catalog, filename):
     pedidos=catalog["array_list"]
     pedido_max=None
     pedido_min=None
-    archivo_chocolates=data_dir + filename
-    with open(archivo_chocolates, encoding="utf-8") as file:
+    archivo_chocolates=data_dir + "/" + filename
+    with open(archivo_chocolates, encoding="utf-8-sig") as file:
         reader = csv.DictReader(file)
         for row in reader:
             for key in row.keys():
@@ -44,8 +44,20 @@ def load_data(catalog, filename):
                 row["Price_per_Box"]=float(row["Price_per_Box"]) if row["Price_per_Box"] != "Unknown" else 0.0
             except ValueError:
                 row["Price_per_Box"]=0.0
+            try:
+                row["Discount_Pct"]=float(row["Discount_Pct"]) if row["Discount_Pct"] != "Unknown" else 0.0
+            except ValueError:
+                row["Discount_Pct"]=0.0
+            try:
+                row["Boxes_Shipped"]=int(row["Boxes_Shipped"]) if row["Boxes_Shipped"] != "Unknown" else 0.0
+            except ValueError:
+                row["Boxes_Shipped"]=0.0
+            try:
+                row["Marketing_Spend"]=float(row["Marketing_Spend"]) if row["Marketing_Spend"] != "Unknown" else 0.0
+            except ValueError:
+                row["Marketing_Spend"]=0.0
             arr.add_last(pedidos,row)
-            
+
             if pedido_min is None:
                 pedido_min=row
             else:
@@ -64,15 +76,15 @@ def load_data(catalog, filename):
     primeros_5=arr.new_list()
     ultimos_5=arr.new_list()
     
-    for i in range(1,min(6,total_pedidos+1)):
+    for i in range(0,min(5,total_pedidos)):
         arr.add_last(primeros_5,arr.get_element(pedidos,i))
-    for i in range(max(1,total_pedidos-4),total_pedidos+1):
+    for i in range(max(0,total_pedidos-5),total_pedidos):
         arr.add_last(ultimos_5,arr.get_element(pedidos,i))
     
     return {
-        "total": total_pedidos,
-        "menor amount": pedido_min,
-        "maximo amount": pedido_max,
+        "total_pedidos": total_pedidos,
+        "pedido_min": pedido_min,
+        "pedido_max": pedido_max,
         "primeros_5": primeros_5,
         "ultimos_5": ultimos_5
     }
@@ -89,29 +101,66 @@ def req_1(catalog,producto):
     count=0
     min_order=None
     max_order=None
-    for pedido in catalog["array_list"]["elements"]:
+    suma_price=0
+    suma_discount=0
+    suma_boxes=0
+    suma_mrkt=0
+    min_ppb=None
+    max_ppb=None
+    min_dis=None
+    max_dis=None
+    min_box=None
+    max_box=None
+    min_mrkt=None
+    max_mrkt=None
+    contador_anio={}
+    for i in range(0,arr.size(catalog["array_list"])):
+        pedido=arr.get_element(catalog["array_list"],i)
         if pedido["Product"] == producto:
             count+=1
             suma_price+=pedido["Price_per_Box"]
-            suma_discount+=pedido["Discount_pct"]
-            suma_boxes+=pedido["Boxes_shipped"]
+            suma_discount+=pedido["Discount_Pct"]
+            suma_boxes+=pedido["Boxes_Shipped"]
             suma_mrkt+=pedido["Marketing_Spend"]
             
-            min_ppb=min(min_ppb,pedido["Price_per_Box"])
-            max_ppb=max(max_ppb,pedido["Price_per_Box"])
-            min_dis=min(min_dis,pedido["Discount_pct"])
-            max_dis=max(max_dis,pedido["Discount_pct"])
-            min_box=min(min_box,pedido["Boxes_shipped"])
-            max_box=max(max_box,pedido["Boxes_shipped"])
-            min_mrkt=min(min_mrkt,pedido["Marketing_Spend"])
-            max_mrkt=max(max_mrkt,pedido["Marketing_Spend"])
+            if min_ppb is None:
+                min_ppb=pedido["Price_per_Box"]
+            else:
+                min_ppb=min(min_ppb,pedido["Price_per_Box"])
+            if max_ppb is None:
+                max_ppb=pedido["Price_per_Box"]
+            else:
+                max_ppb=max(max_ppb,pedido["Price_per_Box"])
+            if min_dis is None:
+                min_dis=pedido["Discount_Pct"]
+            else:
+                min_dis=min(min_dis,pedido["Discount_Pct"])
+            if max_dis is None:
+                max_dis=pedido["Discount_Pct"]
+            else:
+                max_dis=max(max_dis,pedido["Discount_Pct"])
+            if min_box is None:
+                min_box=pedido["Boxes_Shipped"]
+            else:
+                min_box=min(min_box,pedido["Boxes_Shipped"])
+            if max_box is None:
+                max_box=pedido["Boxes_Shipped"]
+            else:
+                max_box=max(max_box,pedido["Boxes_Shipped"])
+            if min_mrkt is None:
+                min_mrkt=pedido["Marketing_Spend"]
+            else:
+                min_mrkt=min(min_mrkt,pedido["Marketing_Spend"])
+            if max_mrkt is None:
+                max_mrkt=pedido["Marketing_Spend"]
+            else:
+                max_mrkt=max(max_mrkt,pedido["Marketing_Spend"])
             
             fecha=str(pedido["Order_Date"])
-            contador_anio={}
             if "-" in fecha:
                 anio=fecha.split("-")[0]
             else:
-                fecha
+                anio="Unknown"
             contador_anio[anio]=contador_anio.get(anio,0)+1
             
             if min_order is None:
@@ -140,15 +189,24 @@ def req_1(catalog,producto):
     if contador_anio:
         anio_mas_pedidos=max(contador_anio,key=contador_anio.get)
     else:
-        "Unknown"
+        anio_mas_pedidos="Unknown"
     return {
-        "promedio price_per_box": prom_ppb,
-        "promedio discount": prom_dis,
-        "promedio boxes_shipped": prom_box,
-        "promedio marketing_spend": prom_mrkt,
-        "año con más pedidos": anio_mas_pedidos,
-        "pedido con menor amount": min_order,
-        "pedido con mayor amount": max_order
+        "avg_price": prom_ppb,
+        "avg_discount": prom_dis,
+        "avg_boxes": prom_box,
+        "avg_marketing": prom_mrkt,
+        "year_max": anio_mas_pedidos,
+        "pedido_min_amount": min_order,
+        "pedido_max_amount": max_order,
+        "min_price": min_ppb,
+        "max_price": max_ppb,
+        "min_discount": min_dis,
+        "max_discount": max_dis,
+        "min_boxes": min_box,
+        "max_boxes": max_box,
+        "min_marketing": min_mrkt,
+        "max_marketing": max_mrkt,
+        "count": count
     }
 
 def req_2(catalog):
@@ -172,7 +230,8 @@ def req_4(catalog):
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
-    pass
+    count=0
+    
 
 
 def req_5(catalog):

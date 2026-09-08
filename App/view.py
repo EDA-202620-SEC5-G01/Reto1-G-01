@@ -64,15 +64,15 @@ def load_data(control):
     print("--Primeros 5 pedidos--")
     tabla_primeros=[]
     total_primeros=arr.size(res["primeros_5"])
-    for i in range(1,total_primeros+1):
-        pedido=arr.get(res["primeros_5"],i)
+    for i in range(0,total_primeros):
+        pedido=arr.get_element(res["primeros_5"],i)
         tabla_primeros.append(columnas(pedido))
     print(tabulate(tabla_primeros,headers=cabeceras,tablefmt="grid"))
     print("\n")
     print("--Últimos 5 pedidos--")
     tabla_ultimos=[]
     total_ultimos=arr.size(res["ultimos_5"])
-    for i in range(1,total_ultimos+1):
+    for i in range(0,total_ultimos):
         pedido=arr.get_element(res["ultimos_5"],i)
         tabla_ultimos.append(columnas(pedido))
     print(tabulate(tabla_ultimos,headers=cabeceras,tablefmt="grid"))
@@ -99,6 +99,7 @@ def print_req_1(control):
     tiempo=logic.delta_time(start_time,end_time)
     if res is None:
         print(f"No se encontró ningún pedido con el producto '{producto}'")
+        return
     
     print(f"Tiempo de ejecución: {tiempo} ms")
     print(f"Total de pedidos con el producto '{producto}': {res['count']}")
@@ -120,9 +121,13 @@ def print_req_1(control):
             f"${float(pedido.get('Price_per_Box', 0)):.2f}",
             f"${float(pedido.get('Marketing_Spend', 0)):.2f}",
             f"${float(pedido.get('Amount', 0)):.2f}"
+
         ]
-    print(f'Valor minimo{res['min_price']}')
-    print(f'Valor maximo{res['max_price']}')
+    tabla_pedidos=[
+        ["Menor"]+datos_pedido(res["pedido_min_amount"]),
+        ["Mayor"]+datos_pedido(res["pedido_max_amount"])]
+    print("--Pedidos con mayor y menor amount--")
+    print(tabulate(tabla_pedidos, headers=["Tipo","Order_ID", "Country", "Order_Date", "Price_per_Box", "Marketing_Spend", "Amount"], tablefmt="grid"))
     
 
 
