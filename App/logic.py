@@ -211,12 +211,79 @@ def req_1(catalog,producto):
         "count": count
     }
 
-def req_2(catalog):
+def req_2(catalog, min_price, max_price):
     """
     Retorna el resultado del requerimiento 2
     """
     # TODO: Modificar el requerimiento 2
-    pass
+    count = 0
+    suma_discount = 0.0
+    suma_marketing = 0.0
+    suma_price = 0.0
+    recent_order = None
+    min_amount_order = None
+    max_amount_order = None
+
+    # Uso estricto de la estructura array_list
+    lista_pedidos = catalog["array_list"]
+    total_pedidos = arr.size(lista_pedidos)
+
+    for i in range(total_pedidos):
+        pedido = arr.get_element(lista_pedidos, i)
+        ppb = pedido["Price_per_Box"]
+        
+        if min_price <= ppb <= max_price:
+            count += 1
+            amount = pedido["Amount"]
+            
+            suma_discount += pedido["Discount_Pct"]
+            suma_marketing += pedido["Marketing_Spend"]
+            suma_price += ppb
+
+            # Pedido más reciente. Desempate: mayor Amount
+            if recent_order is None:
+                recent_order = pedido
+            else:
+                if pedido["Order_Date"] > recent_order["Order_Date"]:
+                    recent_order = pedido
+                elif pedido["Order_Date"] == recent_order["Order_Date"]:
+                    if amount > recent_order["Amount"]:
+                        recent_order = pedido
+
+            # Pedido menor Amount. Desempate: menor Price_per_Box
+            if min_amount_order is None:
+                min_amount_order = pedido
+            else:
+                min_amt = min_amount_order["Amount"]
+                if amount < min_amt:
+                    min_amount_order = pedido
+                elif amount == min_amt:
+                    if ppb < min_amount_order["Price_per_Box"]:
+                        min_amount_order = pedido
+
+            # Pedido mayor Amount. Desempate: menor Price_per_Box
+            if max_amount_order is None:
+                max_amount_order = pedido
+            else:
+                max_amt = max_amount_order["Amount"]
+                if amount > max_amt:
+                    max_amount_order = pedido
+                elif amount == max_amt:
+                    if ppb < max_amount_order["Price_per_Box"]:
+                        max_amount_order = pedido
+
+    if count == 0:
+        return {"count": 0}
+
+    return {
+        "count": count,
+        "promedio_discount": suma_discount / count,
+        "promedio_marketing": suma_marketing / count,
+        "promedio_price": suma_price / count,
+        "recent_order": recent_order,
+        "min_amount_order": min_amount_order,
+        "max_amount_order": max_amount_order
+    }
 
 
 def req_3(catalog):

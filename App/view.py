@@ -136,7 +136,44 @@ def print_req_2(control):
         Función que imprime la solución del Requerimiento 2 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    min_price = float(input("Ingrese el precio mínimo por caja: "))
+    max_price = float(input("Ingrese el precio máximo por caja: "))
+
+    start_time = logic.get_time()
+    res = logic.req_2(control, min_price, max_price)
+    end_time = logic.get_time()
+    tiempo = logic.delta_time(start_time, end_time)
+
+    print("\n--- Resultados Requerimiento 2 ---")
+    print(f"Tiempo de ejecución: {tiempo} ms")
+    print(f"Cantidad de pedidos en el rango: {res['count']}")
+
+    if res['count'] > 0:
+        print(f"Promedio Discount_Pct: {res['promedio_discount']:.2f}%")
+        print(f"Promedio Marketing_Spend: ${res['promedio_marketing']:.2f}")
+        print(f"Promedio Price_per_Box: ${res['promedio_price']:.2f}\n")
+
+        cabeceras = ["Tipo", "Product", "Country", "Channel", "Order_Date", "Price_per_Box", "Amount"]
+        
+        def cols(pedido):
+            return [
+                pedido.get("Product", "Unknown"),
+                pedido.get("Country", "Unknown"),
+                pedido.get("Channel", "Unknown"),
+                pedido.get("Order_Date", "Unknown"),
+                f"${float(pedido.get('Price_per_Box', 0)):.2f}",
+                f"${float(pedido.get('Amount', 0)):.2f}"
+            ]
+
+        tabla = [
+            ["Más Reciente"] + cols(res["recent_order"]),
+            ["Menor Amount"] + cols(res["min_amount_order"]),
+            ["Mayor Amount"] + cols(res["max_amount_order"])
+        ]
+        
+        print(tabulate(tabla, headers=cabeceras, tablefmt="grid"))
+    else:
+        print("No se encontraron pedidos en ese rango de precios.")
 
 
 def print_req_3(control):
