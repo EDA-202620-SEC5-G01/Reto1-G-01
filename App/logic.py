@@ -230,15 +230,15 @@ def req_2(catalog, min_price, max_price):
 
     for i in range(total_pedidos):
         pedido = arr.get_element(lista_pedidos, i)
-        ppb = pedido["Price_per_Box"]
+        ppc = pedido["Price_per_Box"]
         
-        if min_price <= ppb <= max_price:
+        if min_price <= ppc <= max_price:
             count += 1
             amount = pedido["Amount"]
             
             suma_discount += pedido["Discount_Pct"]
             suma_marketing += pedido["Marketing_Spend"]
-            suma_price += ppb
+            suma_price += ppc
 
             # Pedido más reciente. Desempate: mayor Amount
             if recent_order is None:
@@ -258,7 +258,7 @@ def req_2(catalog, min_price, max_price):
                 if amount < min_amt:
                     min_amount_order = pedido
                 elif amount == min_amt:
-                    if ppb < min_amount_order["Price_per_Box"]:
+                    if ppc < min_amount_order["Price_per_Box"]:
                         min_amount_order = pedido
 
             # Pedido mayor Amount. Desempate: menor Price_per_Box
@@ -269,7 +269,7 @@ def req_2(catalog, min_price, max_price):
                 if amount > max_amt:
                     max_amount_order = pedido
                 elif amount == max_amt:
-                    if ppb < max_amount_order["Price_per_Box"]:
+                    if ppc < max_amount_order["Price_per_Box"]:
                         max_amount_order = pedido
 
     if count == 0:
@@ -303,12 +303,75 @@ def req_4(catalog):
     
 
 
-def req_5(catalog):
+def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
     """
     Retorna el resultado del requerimiento 5
     """
     # TODO: Modificar el requerimiento 5
-    pass
+    count = 0
+    suma_price = 0.0
+    suma_boxes = 0.0
+    suma_marketing = 0.0
+    target_order = None
+
+    # Uso estricto de la estructura single_linked_list
+    lista_pedidos = catalog["single_linked_list"]
+    total_pedidos = sll.size(lista_pedidos)
+
+    for i in range(total_pedidos):
+        pedido = sll.get_element(lista_pedidos, i)
+        prod = pedido["Product"]
+        fecha = pedido["Order_Date"]
+        
+        if prod.lower() == producto.lower() and fecha_inicial <= fecha <= fecha_final:
+            count += 1
+            ppc = pedido["Price_per_Box"]
+            amount = pedido["Amount"]
+            mkt = pedido["Marketing_Spend"]
+            boxes = pedido["Boxes_Shipped"]
+
+            suma_price += ppc
+            suma_boxes += boxes
+            suma_marketing += mkt
+
+            if target_order is None:
+                target_order = pedido
+            else:
+                t_amount = target_order["Amount"]
+                t_ppb = target_order["Price_per_Box"]
+                t_mkt = target_order["Marketing_Spend"]
+
+                # Desempates para ambos filtros: menor Price_per_Box -> menor Marketing_Spend
+                if filtro == "MENOR":
+                    if amount < t_amount:
+                        target_order = pedido
+                    elif amount == t_amount:
+                        if ppc < t_ppb:
+                            target_order = pedido
+                        elif ppc == t_ppb:
+                            if mkt < t_mkt:
+                                target_order = pedido
+                elif filtro == "MAYOR":
+                    if amount > t_amount:
+                        target_order = pedido
+                    elif amount == t_amount:
+                        if ppc < t_ppb:
+                            target_order = pedido
+                        elif ppc == t_ppb:
+                            if mkt < t_mkt:
+                                target_order = pedido
+
+    if count == 0:
+        return {"count": 0}
+
+    return {
+        "filtro": filtro,
+        "count": count,
+        "promedio_price": suma_price / count,
+        "promedio_boxes": suma_boxes / count,
+        "promedio_marketing": suma_marketing / count,
+        "target_order": target_order
+    }
 
 def req_6(catalog):
     """
