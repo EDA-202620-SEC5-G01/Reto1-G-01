@@ -27,6 +27,7 @@ def load_data(catalog, filename):
     """
     # TODO: Realizar la carga de datos
     pedidos=catalog["array_list"]
+    pedidos_sll = catalog["single_linked_list"]
     pedido_max=None
     pedido_min=None
     archivo_chocolates=data_dir + "/" + filename
@@ -57,7 +58,8 @@ def load_data(catalog, filename):
             except ValueError:
                 row["Marketing_Spend"]=0.0
             arr.add_last(pedidos,row)
-
+            sll.add_last(pedidos_sll, row)
+            
             if pedido_min is None:
                 pedido_min=row
             else:
