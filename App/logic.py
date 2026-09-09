@@ -18,6 +18,15 @@ def new_logic():
     }
     return catalog
 
+def es_mejor(pedido1,pedido2):
+    
+    if pedido1["Amount"]!=pedido2["Amount"]:
+        return pedido1["Amount"]>pedido2["Amount"]
+    elif pedido1["Marketing_Spend"]!=pedido2["Marketing_Spend"]:
+        return pedido1["Marketing_Spend"]<pedido2["Marketing_Spend"]
+    else:
+        return pedido1["Order_ID"]<pedido2["Order_ID"]
+  
 
 # Funciones para la carga de datos
 
@@ -225,13 +234,51 @@ def req_3(catalog):
     pass
 
 
-def req_4(catalog):
+def req_4(catalog,producto,pais):
     """
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
+    filtrados=sll.new_list()
     count=0
-    
+    price_pb=0
+    discount=0
+    mrktng=0
+    boxes=0
+    top1=None
+    top2=None
+    for i in range(0,arr.size(catalog["array_list"])):
+        pedido=arr.get_element(catalog["array_list"],i)
+        if pedido["Product"]==producto and pedido["Country"]==pais:
+            sll.add_last(filtrados,pedido)
+        
+    for j in range(0,sll.size(filtrados)):
+        pedido2=sll.get_element(filtrados,j)
+        count+=1
+        price_pb+=pedido2["Price_per_Box"]
+        discount+=pedido2["Discount_Pct"]
+        mrktng+=pedido2["Marketing_Spend"]
+        boxes+=pedido2["Boxes_Shipped"]
+        
+        if top1 is None:
+            top1=pedido2
+        elif es_mejor(pedido2,top1):
+            top2=top1
+            top1=pedido2
+        elif top2 is None or es_mejor(pedido2,top2):
+            top2=pedido2
+            
+    if count==0:
+        return None
+    return {
+        "count": count,
+        "avg_price": price_pb/count,
+        "avg_discount": discount/count,
+        "avg_marketing": mrktng/count ,
+        "avg_boxes": boxes/count ,
+        "top1": top1,
+        "top2": top2
+    }
 
 
 def req_5(catalog):

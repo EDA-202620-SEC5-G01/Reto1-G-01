@@ -152,8 +152,41 @@ def print_req_4(control):
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    producto= input("Ingrese el nombre del producto a buscar: ").strip()
+    pais= input("Ingrese el nombre del país a buscar: ").strip()
+    start_time=logic.get_time()
+    res=logic.req_4(control,producto,pais)
+    end_time=logic.get_time()
+    tiempo=logic.delta_time(start_time,end_time)
+    
+    if res is None:
+        print(f"No se encontró ningun pedido con el producto '{producto}' y el país '{pais}'")
+        return
+    print(f"Tiempo de ejecución: {tiempo} ms")
+    print(f"Total de pedidos con el producto '{producto}' y el país '{pais}': {res['count']}")
+    tabla_promedios=[
+        ["Precio por caja (USD)", f"${res['avg_price']:.2f}"],
+        ["Descuento (%)", f"{res['avg_discount']:.2f}"],
+        ["Cajas enviadas", f"{res['avg_boxes']:.2f}"],
+        ["Inversión en Mercadeo (USD)", f"${res['avg_marketing']:.2f}"]
+    ]
+    print(tabulate(tabla_promedios, headers=["Caracteristicas", 'Promedio'], tablefmt="grid"))
+    print("\n")
+    def datos_top(pedido):
+        return[
+            pedido.get("Order_ID",""),
+            pedido.get("Channel",""),
+            pedido.get("Order_Date",""),
+            pedido.get("Boxes_Shipped",""),
+            f"${float(pedido.get('Amount',0)):.2f}",
+        ]
+    tabla_top=[
+        ["Top 1"]+datos_top(res["top1"]),
+        ["Top 2"]+datos_top(res["top2"]),
+    ]
 
+    print("--Pedidos con mayor amount--")
+    print(tabulate(tabla_top, headers=["Puesto","Order_ID", "Channel", "Order_Date", "Boxes_Shipped", "Amount"], tablefmt="grid"))
 
 def print_req_5(control):
     """
