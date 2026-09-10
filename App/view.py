@@ -182,24 +182,26 @@ def print_req_3(control):
     """
     # TODO: Imprimir el resultado del requerimiento 3
     print("\n--- REQUERIMIENTO 3 ---")
-    country = input("Ingrese el país (Country): ")
-    channel = input("Ingrese el canal (Channel): ")
-    
-   
-    resultado = None 
-    
+    country = input("Ingrese el país (Country): ").strip()
+    channel = input("Ingrese el canal (Channel): ").strip()
+
+    start_time = logic.get_time()
+    resultado = logic.req_3(control, country, channel)
+    end_time = logic.get_time()
+    tiempo = logic.delta_time(start_time, end_time)
+
     if not resultado:
         print(f"No se encontraron pedidos para el país '{country}' y canal '{channel}'.")
     else:
         print("\nResultados del filtro:")
-        print(f"Tiempo de ejecución: {resultado.get('tiempo_ms')} ms")
-        print(f"Número total de pedidos: {resultado.get('total_pedidos')}")
-        print(f"Promedio de Price_per_Box: {resultado.get('price_per_box')}")
-        print(f"Promedio de Discount_Pct: {resultado.get('discount_pct')}")
-        print(f"Promedio de Marketing_Spend: {resultado.get('marketing_spend')}")
-        print(f"Promedio de Boxes_Shipped: {resultado.get('boxes_shipped')}")
+        print(f"Tiempo de ejecución: {tiempo} ms")
+        print(f"Número total de pedidos: {resultado.get('count')}")
+        print(f"Promedio de Price_per_Box: ${resultado.get('avg_price'):.2f}")
+        print(f"Promedio de Discount_Pct: {resultado.get('avg_discount'):.2f}%")
+        print(f"Promedio de Marketing_Spend: ${resultado.get('avg_marketing'):.2f}")
+        print(f"Promedio de Boxes_Shipped: {resultado.get('avg_boxes'):.2f}")
         print(f"Producto más frecuente: {resultado.get('producto_frecuente')}")
-        print(f"Año con más pedidos: {resultado.get('ano_frecuente')}")
+        print(f"Año con más pedidos: {resultado.get('year_max')}")
 
 
 def print_req_4(control):
@@ -295,51 +297,54 @@ def print_req_6(control):
     """
     # TODO: Imprimir el resultado del requerimiento 6
     print("\n--- REQUERIMIENTO 6 ---")
-    fecha_inicial = input("Ingrese la fecha inicial (Formato AAAA-MM-DD): ")
-    fecha_final = input("Ingrese la fecha final (Formato AAAA-MM-DD): ")
-    
-    
-    resultado = None 
-    
-    if not resultado:
+    fecha_inicial = input("Ingrese la fecha inicial (Formato AAAA-MM-DD): ").strip()
+    fecha_final = input("Ingrese la fecha final (Formato AAAA-MM-DD): ").strip()
+
+    start_time = logic.get_time()
+    resultado = logic.req_6(control, fecha_inicial, fecha_final)
+    end_time = logic.get_time()
+    tiempo = logic.delta_time(start_time, end_time)
+
+    if not resultado or resultado.get('count', 0) == 0:
         print(f"No se encontraron pedidos en el rango de fechas '{fecha_inicial}' a '{fecha_final}'.")
     else:
         print("\nResultados del filtro:")
-        print(f"Total de pedidos en el rango: {resultado.get('total_pedidos')}")
-        
+        print(f"Tiempo de ejecución: {tiempo} ms")
+        print(f"Total de pedidos en el rango: {resultado.get('count')}")
+
         print("\nCanal más usado (con más pedidos):")
-        print(f"  Nombre: {resultado.get('canal_mas_usado_nombre')}")
-        print(f"  Total pedidos: {resultado.get('canal_mas_usado_total_pedidos')}")
-        print(f"  Total recaudo (Amount): {resultado.get('canal_mas_usado_total_recaudo')}")
+        print(f"  Nombre: {resultado.get('canal_mas_usado')}")
+        print(f"  Total pedidos: {resultado.get('canal_mas_usado_pedidos')}")
+        print(f"  Total recaudo (Amount): ${resultado.get('canal_mas_usado_recaudo'):.2f}")
 
         print("\nCanal de mayor recaudación:")
-        print(f"  Nombre: {resultado.get('canal_mayor_recaudacion_nombre')}")
-        print(f"  Total pedidos: {resultado.get('canal_mayor_recaudacion_total_pedidos')}")
-        print(f"  Total recaudo (Amount): {resultado.get('canal_mayor_recaudacion_total_recaudo')}")
-        
+        print(f"  Nombre: {resultado.get('canal_mas_recauda')}")
+        print(f"  Total pedidos: {resultado.get('canal_mas_recauda_pedidos')}")
+        print(f"  Total recaudo (Amount): ${resultado.get('canal_mas_recauda_recaudo'):.2f}")
+
         print("\nDetalle por canal:")
         for canal, datos in resultado.get('detalle_canales', {}).items():
             print(f"\nCanal: {canal}")
-            print(f"  Promedio Price_per_Box: {datos.get('promedio_price_per_box')}")
-            print(f"  Promedio Marketing_Spend: {datos.get('promedio_marketing_spend')}")
-            
+            print(f"  Promedio Price_per_Box: ${datos.get('avg_price'):.2f}")
+            print(f"  Promedio Marketing_Spend: ${datos.get('avg_marketing'):.2f}")
+
             print("  Pedido más costoso:")
-            pedido_costoso = datos.get('pedido_mas_costoso', {})
-            print(f"    Order ID: {pedido_costoso.get('order_id')}")
-            print(f"    Producto: {pedido_costoso.get('producto')}")
-            print(f"    País: {pedido_costoso.get('pais')}")
-            print(f"    Fecha: {pedido_costoso.get('fecha')}")
-            print(f"    Cajas enviadas: {pedido_costoso.get('cajas_enviadas')}")
-            print(f"    Monto: {pedido_costoso.get('monto')}")
+            pedido_costoso = datos.get('pedido_mas_costoso', {}) or {}
+            print(f"    Order ID: {pedido_costoso.get('Order_ID')}")
+            print(f"    Producto: {pedido_costoso.get('Product')}")
+            print(f"    País: {pedido_costoso.get('Country')}")
+            print(f"    Fecha: {pedido_costoso.get('Order_Date')}")
+            print(f"    Cajas enviadas: {pedido_costoso.get('Boxes_Shipped')}")
+            print(f"    Monto: ${float(pedido_costoso.get('Amount', 0)):.2f}")
 
             print("  Pedido más barato:")
-            pedido_barato = datos.get('pedido_mas_barato', {})
-            print(f"    Order ID: {pedido_barato.get('order_id')}")
-            print(f"    Producto: {pedido_barato.get('producto')}")
-            print(f"    País: {pedido_barato.get('pais')}")
-            print(f"    Fecha: {pedido_barato.get('fecha')}")
-            print(f"    Cajas enviadas: {pedido_barato.get('cajas_enviadas')}")
-            print(f"    Monto: {pedido_barato.get('monto')}")
+            pedido_barato = datos.get('pedido_mas_barato', {}) or {}
+            print(f"    Order ID: {pedido_barato.get('Order_ID')}")
+            print(f"    Producto: {pedido_barato.get('Product')}")
+            print(f"    País: {pedido_barato.get('Country')}")
+            print(f"    Fecha: {pedido_barato.get('Order_Date')}")
+            print(f"    Cajas enviadas: {pedido_barato.get('Boxes_Shipped')}")
+            print(f"    Monto: ${float(pedido_barato.get('Amount', 0)):.2f}")
 
 # Se crea la lógica asociado a la vista
 control = new_logic()
