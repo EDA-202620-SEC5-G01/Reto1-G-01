@@ -185,10 +185,7 @@ def print_req_3(control):
     country = input("Ingrese el país (Country): ")
     channel = input("Ingrese el canal (Channel): ")
     
-    # Llamada al controlador (ajustar el nombre de la función según el código real)
-    # resultado = controller.req3(catalogo, country, channel)
-    # Supendremos que 'resultado' es una tupla o diccionario con:
-    # (tiempo_ms, total_pedidos, prom_price, prom_discount, prom_marketing, prom_boxes, prod_frecuente, ano_frecuente)
+   
     resultado = None 
     
     if not resultado:
@@ -301,8 +298,7 @@ def print_req_6(control):
     fecha_inicial = input("Ingrese la fecha inicial (Formato AAAA-MM-DD): ")
     fecha_final = input("Ingrese la fecha final (Formato AAAA-MM-DD): ")
     
-    # Llamada al controlador (ajustar el nombre de la función según el código real)
-    # resultado = controller.req6(catalogo, fecha_inicial, fecha_final)
+    
     resultado = None 
     
     if not resultado:
