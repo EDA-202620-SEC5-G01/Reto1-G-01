@@ -457,13 +457,57 @@ def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
         "target_order": target_order
     }
 
-def req_6(catalog):
+def req_6(catalog, fecha_inicial, fecha_final):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    pass
+    count = 0
+    canales = {}
+    lista_pedidos = catalog['single_linked_list']
+    total_pedidos = sll.size(lista_pedidos)
+    for i in range(total_pedidos):
+        pedido = sll.get_element(lista_pedidos, i)
+        fecha = pedido['Order_Date']
+        
+        if fecha_inicial <= fecha <= fecha_final:
+            count += 1
+            canal = pedido['Channel']
+            
+            if canal not in canales: 
+                canales[canal] = {'pedidos': 0, 'recaudo': 0.0, 'suma_price': 0.0, 'suma_mrkt':0.0, 'min_order': None, 'max_order': None}
+            
+            info = canales[canal]
+            info['pedidos'] += 1
+            info['recaudo'] += pedido['Amount']
+            info['suma_price'] += pedido['Price_per_Box']
+            info['suma_mrkt'] += pedido['Marketing_Spend']
+            
+            if info['min_order'] is None:
+                info['min_order'] = pedido
+            elif pedido['Amount'] < info['min_order']['Amount']:
+                info['min_order'] = pedido
+            elif pedido['Amount'] == info['min_order']['Amount'] and pedido['Marketing_Spend'] < info['min_order']['Marketing_Spend']:
+                info['min_order'] = pedido
+            
+            if info['max_order'] is None:
+                info['max_order'] = pedido
+            elif pedido['Amount'] > info['max_order']['Amount']:
+                info['max_order'] = pedido
+            elif pedido['Amount'] == info['max_order']['Amount'] and pedido['Marketing_Spend'] > info['max_order']['Marketing_Spend']:
+                info['max_order'] = pedido
+    
+    if count == 0 :
+        return { 'count': 0}
+    
+    canal_mas_usado = max(canales, key= lambda c: canales[c]['pedidos'])
+    canal_mas_recauda = max(canales, key= lambda c: canales[c]['recaudo'])
+    
+    detalle_canales = {}
+    for canal, info in canales.items():
+        detalle_canales[canal] = {'avg_price': info['suma_price']/info['pedidos'],'avg_marketing': info['suma_mrkt']/info['pedidos'], 'pedido_mas_costoso': info['max_order'], 'pedido_mas_barato': info['min_order'], 'pedidos': info['pedidos'], 'recaudo': info['recaudo']}
 
+    return {'count': count, 'canal_mas_usado': canal_mas_usado, 'canal_mas_usado_pedidos': canales[canal_mas_usado]['pedidos'], 'canal_mas_usado_recaudo': canales[canal_mas_usado]['recaudo'], 'canal_mas_recauda': canal_mas_recauda, 'canal_mas_recauda_pedidos': canales[canal_mas_recauda]['pedidos'], 'canal_mas_recauda_recaudo': canales[canal_mas_recauda]['recaudo'], 'detalle_canales': detalle_canales}
 
 # Funciones para medir tiempos de ejecucion
 
