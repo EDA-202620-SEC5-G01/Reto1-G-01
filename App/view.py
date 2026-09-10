@@ -181,7 +181,29 @@ def print_req_3(control):
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    print("\n--- REQUERIMIENTO 3 ---")
+    country = input("Ingrese el país (Country): ")
+    channel = input("Ingrese el canal (Channel): ")
+    
+    try:
+        # Llamada al controlador (ajustar el nombre de la función según el código real)
+        # resultado = controller.req3(catalogo, country, channel)
+        resultado = None 
+        
+        if not resultado:
+            print(f"No se encontraron pedidos para el país '{country}' y canal '{channel}'.")
+        else:
+            print("\nResultados del filtro:")
+            # Las salidas dependen del formato en que el controlador retorne los datos.
+            # Según la especificación, se imprimen las sumas y variables acumuladas:
+            print(f"Suma/Promedio Price per Box: {resultado.get('price_per_box')}")
+            print(f"Suma/Promedio Discount Pct: {resultado.get('discount_pct')}")
+            print(f"Suma/Promedio Marketing Spend: {resultado.get('marketing_spend')}")
+            print(f"Suma/Promedio Boxes Shipped: {resultado.get('boxes_shipped')}")
+            print(f"Producto más frecuente: {resultado.get('producto_frecuente')}")
+            print(f"Año más frecuente: {resultado.get('ano_frecuente')}")
+    except Exception as e:
+        print(f"Ocurrió un error al ejecutar el requerimiento 3: {e}")
 
 
 def print_req_4(control):
@@ -276,7 +298,53 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    print("\n--- REQUERIMIENTO 6 ---")
+    fecha_inicial = input("Ingrese la fecha inicial (Formato AAAA-MM-DD): ")
+    fecha_final = input("Ingrese la fecha final (Formato AAAA-MM-DD): ")
+    
+    # Llamada al controlador (ajustar el nombre de la función según el código real)
+    # resultado = controller.req6(catalogo, fecha_inicial, fecha_final)
+    resultado = None 
+    
+    if not resultado:
+        print(f"No se encontraron pedidos en el rango de fechas '{fecha_inicial}' a '{fecha_final}'.")
+    else:
+        print("\nResultados del filtro:")
+        print(f"Total de pedidos en el rango: {resultado.get('total_pedidos')}")
+        
+        print("\nCanal más usado (con más pedidos):")
+        print(f"  Nombre: {resultado.get('canal_mas_usado_nombre')}")
+        print(f"  Total pedidos: {resultado.get('canal_mas_usado_total_pedidos')}")
+        print(f"  Total recaudo (Amount): {resultado.get('canal_mas_usado_total_recaudo')}")
+
+        print("\nCanal de mayor recaudación:")
+        print(f"  Nombre: {resultado.get('canal_mayor_recaudacion_nombre')}")
+        print(f"  Total pedidos: {resultado.get('canal_mayor_recaudacion_total_pedidos')}")
+        print(f"  Total recaudo (Amount): {resultado.get('canal_mayor_recaudacion_total_recaudo')}")
+        
+        print("\nDetalle por canal:")
+        for canal, datos in resultado.get('detalle_canales', {}).items():
+            print(f"\nCanal: {canal}")
+            print(f"  Promedio Price_per_Box: {datos.get('promedio_price_per_box')}")
+            print(f"  Promedio Marketing_Spend: {datos.get('promedio_marketing_spend')}")
+            
+            print("  Pedido más costoso:")
+            pedido_costoso = datos.get('pedido_mas_costoso', {})
+            print(f"    Order ID: {pedido_costoso.get('order_id')}")
+            print(f"    Producto: {pedido_costoso.get('producto')}")
+            print(f"    País: {pedido_costoso.get('pais')}")
+            print(f"    Fecha: {pedido_costoso.get('fecha')}")
+            print(f"    Cajas enviadas: {pedido_costoso.get('cajas_enviadas')}")
+            print(f"    Monto: {pedido_costoso.get('monto')}")
+
+            print("  Pedido más barato:")
+            pedido_barato = datos.get('pedido_mas_barato', {})
+            print(f"    Order ID: {pedido_barato.get('order_id')}")
+            print(f"    Producto: {pedido_barato.get('producto')}")
+            print(f"    País: {pedido_barato.get('pais')}")
+            print(f"    Fecha: {pedido_barato.get('fecha')}")
+            print(f"    Cajas enviadas: {pedido_barato.get('cajas_enviadas')}")
+            print(f"    Monto: {pedido_barato.get('monto')}")
 
 # Se crea la lógica asociado a la vista
 control = new_logic()
