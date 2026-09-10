@@ -185,25 +185,24 @@ def print_req_3(control):
     country = input("Ingrese el país (Country): ")
     channel = input("Ingrese el canal (Channel): ")
     
-    try:
-        # Llamada al controlador (ajustar el nombre de la función según el código real)
-        # resultado = controller.req3(catalogo, country, channel)
-        resultado = None 
-        
-        if not resultado:
-            print(f"No se encontraron pedidos para el país '{country}' y canal '{channel}'.")
-        else:
-            print("\nResultados del filtro:")
-            # Las salidas dependen del formato en que el controlador retorne los datos.
-            # Según la especificación, se imprimen las sumas y variables acumuladas:
-            print(f"Suma/Promedio Price per Box: {resultado.get('price_per_box')}")
-            print(f"Suma/Promedio Discount Pct: {resultado.get('discount_pct')}")
-            print(f"Suma/Promedio Marketing Spend: {resultado.get('marketing_spend')}")
-            print(f"Suma/Promedio Boxes Shipped: {resultado.get('boxes_shipped')}")
-            print(f"Producto más frecuente: {resultado.get('producto_frecuente')}")
-            print(f"Año más frecuente: {resultado.get('ano_frecuente')}")
-    except Exception as e:
-        print(f"Ocurrió un error al ejecutar el requerimiento 3: {e}")
+    # Llamada al controlador (ajustar el nombre de la función según el código real)
+    # resultado = controller.req3(catalogo, country, channel)
+    # Supendremos que 'resultado' es una tupla o diccionario con:
+    # (tiempo_ms, total_pedidos, prom_price, prom_discount, prom_marketing, prom_boxes, prod_frecuente, ano_frecuente)
+    resultado = None 
+    
+    if not resultado:
+        print(f"No se encontraron pedidos para el país '{country}' y canal '{channel}'.")
+    else:
+        print("\nResultados del filtro:")
+        print(f"Tiempo de ejecución: {resultado.get('tiempo_ms')} ms")
+        print(f"Número total de pedidos: {resultado.get('total_pedidos')}")
+        print(f"Promedio de Price_per_Box: {resultado.get('price_per_box')}")
+        print(f"Promedio de Discount_Pct: {resultado.get('discount_pct')}")
+        print(f"Promedio de Marketing_Spend: {resultado.get('marketing_spend')}")
+        print(f"Promedio de Boxes_Shipped: {resultado.get('boxes_shipped')}")
+        print(f"Producto más frecuente: {resultado.get('producto_frecuente')}")
+        print(f"Año con más pedidos: {resultado.get('ano_frecuente')}")
 
 
 def print_req_4(control):
