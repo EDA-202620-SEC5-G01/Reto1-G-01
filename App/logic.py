@@ -295,13 +295,50 @@ def req_2(catalog, min_price, max_price):
     }
 
 
-def req_3(catalog):
+def req_3(catalog, pais, canal):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
-
+    count = 0
+    suma_price = 0.0
+    suma_discount = 0.0
+    suma_mrkt= 0.0
+    suma_boxes = 0.0
+    contador_ano = {}
+    contador_producto = {}
+    lista_pedidos = catalog['array_list']
+    total_pedidos = arr.size(lista_pedidos)
+    for i in range(total_pedidos):
+        pedido = arr.get_element(lista_pedidos, i)
+        if pedido['Country'] == pais and pedido['Channel'] == canal:
+            count += 1
+            suma_price += pedido['Price_per_Box']
+            suma_discount += pedido['Discount_Pct']
+            suma_mrkt += pedido['Marketing_Spend']
+            suma_boxes += pedido['Boxes_Shipped']
+            
+            producto = pedido['Product']
+            contador_producto[producto] = contador_producto.get(producto, 0) + 1
+            
+            fecha = str(pedido['Order_Date'])
+            if "-" in fecha:
+                ano = fecha.split('-')[0]
+            else:
+                ano = 'Unknown'
+            contador_ano[ano] = contador_ano.get(ano, 0) +1
+    if count == 0:
+        return None
+    
+    if len(contador_producto) > 0:
+        producto_frecuente = max(contador_producto, key= contador_producto.get)
+    else: 
+        producto_frecuente = 'Unknown'
+    if len(contador_ano) > 0:
+        ano_mas_pedidos = max(contador_ano, key= contador_ano.get)
+    else:
+        ano_mas_pedidos = 'Unknown'
+    return {'count': count, 'avg_price': suma_price/count, 'avg_discount': suma_discount/count, 'avg_marketing': suma_mrkt/count, 'avg_boxes': suma_boxes/count, 'producto_frecuente': producto_frecuente, 'year_max': ano_mas_pedidos}
 
 def req_4(catalog,producto,pais):
     """
